@@ -5,8 +5,8 @@ var gBoard = [];  // The model
 // A Matrix containing cell objects:
 
 var gLevel = {
-     SIZE: 4,
-     MINES: 2
+    SIZE: 4,
+    MINES: 2
 };
 // This is an object by which the
 // board size is set (in this case:
@@ -15,10 +15,10 @@ var gLevel = {
 
 
 var gGame = {
- isOn: false,
- shownCount: 0,
- markedCount: 0,
- secsPassed: 0
+    isOn: false,
+    shownCount: 0,
+    markedCount: 0,
+    secsPassed: 0
 }
 // This is an object in which you
 // can keep and update the
@@ -35,11 +35,11 @@ var gGame = {
 
 
 
-function initGame()  {
+function initGame() {
     console.log('init');
 
     // create start game:
-    gBoard =  buildBoard(gLevel.SIZE)
+    gBoard = buildBoard(gLevel.SIZE)
     renderBoard(gBoard);
 }
 //  This is called when page loads
@@ -51,27 +51,28 @@ function buildBoard(size) {
     for (var i = 0; i < size; i++) {
         board[i] = [];
 
-        for (let j = 0; j < size; j++) {
-            var cellContant =  createCell();
-            board[i][j] = cellContant;        
+        for (var j = 0; j < size; j++) {
+            var cellContant = createCell(i, j);
+            board[i][j] = cellContant;
+
         }
     }
 
-    
+
     /// Place 2 mines manually when each cell’s isShown set to true. 
     board[1][1].isShown = true;  // shown cell - not mine
 
-    board[2][3].isShown = true; 
+    board[2][3].isShown = true;
     board[2][3].isMine = true;   // shown cell - mine
-    
+
     board[0][2].isMine = true;   // not shown cell - mine
-    
-    
-    board[3][3].isMarked = true;  
+
+
+    board[3][3].isMarked = true;
     board[3][3].isMine = true;   // not shown marked cell - mine
-    
+
     board[0][3].isMarked = true; // not shown marked cell - not mine 
-   
+
     /////////////////////////////////
 
     console.table(board)
@@ -83,37 +84,61 @@ function buildBoard(size) {
 //  Return the created board
 
 
-function createCell() {
+function createCell(i, j) {
     var cell = {
+        location: { i: i, j: j },
         minesAroundCount: 0,
         isShown: false,
         isMine: false,
         isMarked: false
-        }
+    }
     return cell;
 }
 
 
-// setMinesNegsCount(board) 
+function setMinesNegsCount(board) {
+    console.log('count ngs');
+
+    for (var i = 0; i < board.length; i++) {
+        for (var j = 0; j < board[0].length; j++) {
+            console.log(board[i][j]);
+            var cell = board[i][j];
+            cell.minesAroundCount = getNgsCount(board, cell.location);
+        }
+    }
+
+}
 //  Count mines around each cell
 //  and set the cell's
 //  minesAroundCount.
 
 
-function renderBoard(board)  {
+function getNgsCount(board, locationObj) {
+    for (var i = locationObj.i-1; i < board.length; i++) {
+        for (var j = 0; j < board[0].length; j++) {
+            console.log(board[i][j]);
+            var cell = board[i][j];
+            cell.minesAroundCount = getNgsCount(board, cell.location);
+        }
+    }
+
+}
+
+
+function renderBoard(board) {
     console.log('render board', board);
-    
+
     var strHTML = '';
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>';
         console.log(strHTML);
-            for (let j = 0; j < board[0].length; j++) {
+        for (let j = 0; j < board[0].length; j++) {
 
-                strHTML += '<td>';
-                    strHTML += getCellHTML(board[i][j]);
-                strHTML += '</td>';
-                console.log(strHTML);
-            }
+            strHTML += '<td>';
+            strHTML += getCellHTML(board[i][j]);
+            strHTML += '</td>';
+            console.log(strHTML);
+        }
 
         strHTML += '</tr>';
     }
@@ -121,7 +146,7 @@ function renderBoard(board)  {
     var elTable = document.querySelector('.board');
     elTable.innerHTML = ''
     console.log('board HTML el', elTable);
-    
+
     elTable.innerHTML = strHTML;
     console.log('board HTML el', elTable);
 }
@@ -129,10 +154,10 @@ function renderBoard(board)  {
 
 
 function getCellHTML(cellObj) {
-    var shownCell =  (cellObj.isShown)? 'shown' : 'notShown';
-    var mineCell = (cellObj.isMine)? 'mine' : 'notMine';
-    var markCell = (cellObj.isMarked)? 'marked' : 'notMarked';
-    
+    var shownCell = (cellObj.isShown) ? 'shown' : 'notShown';
+    var mineCell = (cellObj.isMine) ? 'mine' : 'notMine';
+    var markCell = (cellObj.isMarked) ? 'marked' : 'notMarked';
+
     var strHTML = `<div class="cell ${shownCell} ${mineCell} ${markCell} color${cellObj.minesAroundCount}">${cellObj.minesAroundCount}</div>`
     console.log(strHTML);
     return strHTML;
