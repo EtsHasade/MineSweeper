@@ -1,0 +1,73 @@
+body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: rgb(182, 177, 157);
+    margin: 0px;
+ 
+
+}
+
+
+.game {
+    padding: 10px;
+    grid-column:2/3;
+}
+
+.nav, .features, .floor, .face{
+    background-color: #222;
+    font-weight: bold;
+    color: khaki;
+    text-align: center;
+    grid-column: 1/4;
+    padding: 5px;
+}
+
+.face {
+    background-color: rgb(0, 55, 100);
+}
+
+.floor {
+background-color: rgb(0, 0, 0);
+}
+
+
+td {
+    padding: 0px;
+}
+
+.cell {
+    background-color: rgb(94, 126, 106);
+    width: 1.5em;
+    height: 1.5em;
+    border: 1px solid #222;
+    text-align: center;
+}
+
+
+.shown {
+    background-color: rgb(35, 78, 22);
+} 
+
+
+
+.shown.mine  {
+    background-color: rgb(255, 0, 0);
+}
+
+.notShown {
+    background-color: rgb(255, 249, 213);
+} 
+
+
+.marked {
+    background-color: rgb(38, 0, 255);
+} 
+
+.notMarked {
+ }
+
+
+.ref {
+    display: none;
+}
+
