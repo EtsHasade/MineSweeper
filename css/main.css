@@ -47,6 +47,21 @@ body {
 
 button {
     cursor: pointer;
+    height: 30px;
+    width: 100px;
+    margin-left: 3em;
+    background: rgb(255, 237, 220);
+    border: none;
+    transition: 0.4s;
+}
+
+
+button:hover{
+    background: rgb(255, 255, 255);
+}
+
+button:checked {
+    background: rgb(123, 255, 0);
 }
 
 .floor {
