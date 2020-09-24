@@ -272,10 +272,10 @@ function cellClicked(elCell) {
 
     if (objCell.isMarked) return;
 
+    face(CLICK);
     setShownTrue(objCell, elCell);
     expandShown(gBoard, objCell);
     checkGameOver(objCell);
-    face(CLICK);
 }
 //  Called when a cell (td) is  clicked
 
@@ -334,6 +334,8 @@ function checkGameOver(objCell) {
     if (objCell.isMine && objCell.isShown) {
         gGame.lifeCount--;
         elLifeCount()
+        face(BOOM);
+
     }
     if (gGame.lifeCount <= 0) gameOvar('Loser');
     if (gGame.shownCount + gGame.markedCount === gBoard.length ** 2 && gGame.markedCount === gLevel[gCurrLevel].MINES) gameOvar('Winner')
@@ -345,7 +347,8 @@ function checkGameOver(objCell) {
 
 function gameOvar(msg) {
     console.log('game over -', msg);
-    face(GAME_OVER);
+    var emotion = (msg === 'Loser') ? GAME_OVER : WINNER;
+    face(emotion);
     // alert('game over -' + msg);
     gGame.isOn = false;
     shownAllmines(gBoard);
@@ -432,15 +435,21 @@ function elMarkedCount() {
 
 function timerView() {
     var elTimer = document.querySelector('.timerView span');
-    var startTime = Date.now(); // Get Starting time in MS
+    var startTimeSec = Date.now(); // Get Starting time in MS
+    var startTimeMin = Date.now(); // Get Starting time in MS
     var endTime = 0;
     var timeDiffSec = 0;
     var timeDiffMin = 0;
 
     gTimer = setInterval(function () {
         endTime = Date.now(); // Get current Time
-        timeDiffSec = Math.floor((endTime - startTime) * 0.001); // current time - startTime = Time Elapsed
-        timeDiffMin = Math.floor((endTime - startTime) / 60 * 0.001); // current time - startTime = Time Elapsed
+        console.log('end time',endTime);
+        if (Math.floor((endTime - startTimeSec) * 0.001) > 60) {
+            startTimeSec = Date.now();
+        } 
+
+        timeDiffSec = Math.floor((endTime - startTimeSec) * 0.001); // current time - startTime = Time Elapsed
+        timeDiffMin = Math.floor((endTime - startTimeMin) / 60 * 0.001); // current time - startTime = Time Elapsed
         elTimer.innerText = '' + timeDiffMin + ':' + timeDiffSec;
         console.log(timeDiffMin + ':' + timeDiffSec);
 
@@ -457,31 +466,31 @@ var BOOM = 'boom';
 var GAME_OVER = 'game over';
 var WINNER = 'winner';
 var CLICK = 'click';
+var timeFace;
 
 function face(status = 'normal') {
-    var timeFace;
     var elFace = document.querySelector('.face');
-    // console.log('face',elFace);
+
     switch (status) {
         case 'normal':
             clearTimeout(timeFace);
             elFace.innerText = '😺';
             break;
 
-        case 'click':
-            clearTimeout(timeFace);
-            elFace.innerText = '🐱';
-            setTimeout(function () {
-                face(NORMAL);
-            }, 250);
-            break;
-
         case 'boom':
             clearTimeout(timeFace);
             elFace.innerText = '😾';
-            setTimeout(function () {
+            timeFace = setTimeout(function () {
                 face(NORMAL);
-            }, 1000);
+            }, 2000);
+            break;
+
+        case 'click':
+            clearTimeout(timeFace);
+            elFace.innerText = '🐱';
+            timeFace = setTimeout(function () {
+                face(NORMAL);
+            }, 250);
             break;
 
         case 'game over':

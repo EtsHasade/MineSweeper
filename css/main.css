@@ -38,8 +38,15 @@ body {
 
 
 .face {
-    background-color: rgb(0, 55, 100);
+    background-color: rgb(136, 154, 168);
     cursor: context-menu;
+    font-size: 30px;
+    border-bottom: 1px solid black;
+    cursor: pointer;
+}
+
+button {
+    cursor: pointer;
 }
 
 .floor {
