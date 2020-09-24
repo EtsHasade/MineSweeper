@@ -86,6 +86,7 @@ function initGame() {
         beforFirstClick: true,
         lifeCount: gLevel[gCurrLevel].LIFE
     }
+    face(NORMAL);
 
     // create start game:
     gGame.isOn = true;
@@ -99,7 +100,7 @@ function initGame() {
     //render view
     elLifeCount()
     elMarkedCount()
-    console.table(gBoard)
+    console.table('end init gBoard', gBoard)
 
 }
 //  This is called when page loads
@@ -117,7 +118,7 @@ function buildBoard(size) {
 
         }
     }
-    console.table(board)
+    console.table('finish biuld board', board)
     return board;
 }
 //  Builds the board
@@ -130,21 +131,24 @@ function genMines(board, mineAmount, safeCEll) {
     // board[3][2].isMine = true;   // shown cell - mine
     // board[3][1].isMine = true;   // shown cell - mine
 
-
     while (mineAmount > 0) {
         console.log('tray agian gen mines', mineAmount);
 
         for (var i = 0; i < board.length; i++) {
             for (var j = 0; j < board[0].length; j++) {
                 var cell = board[i][j];
-                // console.log('cell befor', cell);
 
                 if (cell.isMine || cell.location.i === safeCEll.location.i && cell.location.j === safeCEll.location.j) continue;
-                if (getRandomInt(0, (board.length * board[0].length) - 1) === 1) {
 
+                // if (getRandomInt(0, (board.length * board[0].length) - 1) === 1) {
+                console.log('mineAmount', mineAmount);
+                if (getRandomInt(0, (board.length * board[0].length) - 1) === 1) {
                     board[i][j].isMine = true;
-                    console.log('cell board after', board[i][j].isMine);
+                    console.log('gen mine in cell:', board[i][j]);
                     mineAmount--;
+                    if (mineAmount <= 0) return;
+                } else {
+                    console.log('not Gen mine in cell:', board[i][j]);
                 }
             }
         }
@@ -223,7 +227,6 @@ function renderBoard(board) {
             strHTML += '</td>';
             // console.log(strHTML);
         }
-
         strHTML += '</tr>';
     }
 
@@ -272,6 +275,7 @@ function cellClicked(elCell) {
     setShownTrue(objCell, elCell);
     expandShown(gBoard, objCell);
     checkGameOver(objCell);
+    face(CLICK);
 }
 //  Called when a cell (td) is  clicked
 
@@ -341,11 +345,13 @@ function checkGameOver(objCell) {
 
 function gameOvar(msg) {
     console.log('game over -', msg);
-    alert('game over -' + msg);
+    face(GAME_OVER);
+    // alert('game over -' + msg);
     gGame.isOn = false;
     shownAllmines(gBoard);
     renderBoard(gBoard);
     clearInterval(gTimer);
+
 }
 
 function shownAllmines(board) {
@@ -431,17 +437,66 @@ function timerView() {
     var timeDiffSec = 0;
     var timeDiffMin = 0;
 
-    gTimer = setInterval(function() {
+    gTimer = setInterval(function () {
         endTime = Date.now(); // Get current Time
-        timeDiffSec = Math.floor((endTime - startTime)* 0.001); // current time - startTime = Time Elapsed
+        timeDiffSec = Math.floor((endTime - startTime) * 0.001); // current time - startTime = Time Elapsed
         timeDiffMin = Math.floor((endTime - startTime) / 60 * 0.001); // current time - startTime = Time Elapsed
-        elTimer.innerText = ''+timeDiffMin+':'+timeDiffSec;
-        console.log(timeDiffMin+':'+timeDiffSec);
+        elTimer.innerText = '' + timeDiffMin + ':' + timeDiffSec;
+        console.log(timeDiffMin + ':' + timeDiffSec);
 
-    },1000);
+    }, 1000);
 
     console.log(gGame.secsPassed);
 
 }
 
 
+
+var NORMAL = 'normal';
+var BOOM = 'boom';
+var GAME_OVER = 'game over';
+var WINNER = 'winner';
+var CLICK = 'click';
+
+function face(status = 'normal') {
+    var timeFace;
+    var elFace = document.querySelector('.face');
+    // console.log('face',elFace);
+    switch (status) {
+        case 'normal':
+            clearTimeout(timeFace);
+            elFace.innerText = '😺';
+            break;
+
+        case 'click':
+            clearTimeout(timeFace);
+            elFace.innerText = '🐱';
+            setTimeout(function () {
+                face(NORMAL);
+            }, 250);
+            break;
+
+        case 'boom':
+            clearTimeout(timeFace);
+            elFace.innerText = '😾';
+            setTimeout(function () {
+                face(NORMAL);
+            }, 1000);
+            break;
+
+        case 'game over':
+            clearTimeout(timeFace);
+            elFace.innerText = '🙀';
+            break;
+
+        case 'winner':
+            clearTimeout(timeFace);
+            elFace.innerText = '🐱‍👤';
+            break;
+
+        default:
+            elFace.innerText = '😺';
+            break;
+    }
+
+}
