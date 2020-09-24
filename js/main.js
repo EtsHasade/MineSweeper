@@ -49,31 +49,32 @@ var gRenderView = {
 }
 
 
- function initBeginner() {
+function initBeginner() {
     gGame.isOn = false;
     gCurrLevel = 0;
     initGame();
- }
+}
 
- 
- function initMedium()  {
+
+function initMedium() {
     gGame.isOn = false;
     gCurrLevel = 1;
     initGame();
- }
+}
 
- 
- function initExpert()  {
+
+function initExpert() {
     gGame.isOn = false;
     gCurrLevel = 2;
     initGame();
- }
+}
 
 
 
 
 function initGame() {
     console.log('init');
+    clearInterval(gTimer);
 
     gBoard = [];
     gGame = {
@@ -85,8 +86,6 @@ function initGame() {
         beforFirstClick: true,
         lifeCount: gLevel[gCurrLevel].LIFE
     }
-
-    timerView();
 
     // create start game:
     gGame.isOn = true;
@@ -118,33 +117,6 @@ function buildBoard(size) {
 
         }
     }
-
-    // unit test area:
-    /// Place 2 mines manually when each cell’s isShown set to true. 
-    // board[1][1].isShown = true;  // shown cell - not mine
-
-    // board[2][3].isShown = true;
-    // board[2][3].isMine = true;   // shown cell - mine
-
-    // board[0][2].isMine = true;   // not shown cell - mine
-
-
-    // board[3][3].isMarked = true;
-    // board[3][3].isMine = true;   // not shown marked cell - mine
-
-    // board[0][3].isMarked = true; // not shown marked cell - not mine 
-
-
-    // board[0][3].isShown = true;
-    // board[2][3].isMine = true;   // shown cell - mine
-
-    // board[2][1].isShown = true;
-    // board[2][1].isMine = true;   // shown cell - mine
-
-    // board[3][2].isShown = true;
-    // board[3][2].isMine = true;   // shown cell - mine
-    /////////////////////////////////
-
     console.table(board)
     return board;
 }
@@ -292,6 +264,7 @@ function cellClicked(elCell) {
         genMines(gBoard, gLevel[gCurrLevel].MINES, objCell);
         setMinesNegsCount(gBoard)
         renderBoard(gBoard);
+        timerView()
     }
 
     if (objCell.isMarked) return;
@@ -368,10 +341,11 @@ function checkGameOver(objCell) {
 
 function gameOvar(msg) {
     console.log('game over -', msg);
-    // alert('game over -' + msg);
+    alert('game over -' + msg);
     gGame.isOn = false;
     shownAllmines(gBoard);
     renderBoard(gBoard);
+    clearInterval(gTimer);
 }
 
 function shownAllmines(board) {
@@ -445,27 +419,29 @@ function elLifeCount() {
 function elMarkedCount() {
     var elLife = document.querySelector('.markedView span');
     // console.log('elLife', elLife);
-    elLife.innerText = gGame.markedCount+'/'+gLevel[gCurrLevel].MINES;
+    elLife.innerText = gGame.markedCount + '/' + gLevel[gCurrLevel].MINES;
 }
 
 
 
-function timerView(){
+function timerView() {
     var elTimer = document.querySelector('.timerView span');
-    // console.log('elTimer', elTimer);
-    gGame.secsPassed = 0;
+    var startTime = Date.now(); // Get Starting time in MS
+    var endTime = 0;
+    var timeDiffSec = 0;
+    var timeDiffMin = 0;
 
-    var start = new Date().getTime
-    var now = Date().getTime-Date(start).getTime
-
-    gTimer = undefined;
     gTimer = setInterval(function() {
-        gGame.secsPassed++;
-        elTimer.innerText = ''+(gGame.secsPassed / 1000 );
-    },1000); 
+        endTime = Date.now(); // Get current Time
+        timeDiffSec = Math.floor((endTime - startTime)* 0.001); // current time - startTime = Time Elapsed
+        timeDiffMin = Math.floor((endTime - startTime) / 60 * 0.001); // current time - startTime = Time Elapsed
+        elTimer.innerText = ''+timeDiffMin+':'+timeDiffSec;
+        console.log(timeDiffMin+':'+timeDiffSec);
 
-console.log(gGame.secsPassed);
- 
+    },1000);
+
+    console.log(gGame.secsPassed);
+
 }
 
 
