@@ -3,14 +3,15 @@ body {
     grid-template-columns: 1fr 1fr 1fr;
     background-color: rgb(182, 177, 157);
     margin: 0px;
- 
-
+    font-family: Arial, Helvetica, sans-serif;
+     
 }
 
 
 .game {
     padding: 10px;
     grid-column:2/3;
+    justify-self: center;
 }
 
 .nav, .features, .floor, .face{
@@ -22,8 +23,23 @@ body {
     padding: 5px;
 }
 
+.dataView {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.dataView h2{
+    display: inline-block;
+    margin-left: 3em;
+    font-weight: bold;
+    text-align: start;
+    
+}
+
+
 .face {
     background-color: rgb(0, 55, 100);
+    cursor: context-menu;
 }
 
 .floor {
@@ -37,22 +53,24 @@ td {
 
 .cell {
     background-color: rgb(94, 126, 106);
-    width: 1.5em;
-    height: 1.5em;
+    color: rgba(0,0,0,0);
+    width: 2em;
+    height: 2em;
     border: 1px solid #222;
     text-align: center;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    font-weight: bold;
+    position: relative;
+
+    
 }
 
 
 .shown {
-    background-color: rgb(35, 78, 22);
+    background-color: rgb(165, 201, 154);
+    
 } 
-
-
-
-.shown.mine  {
-    background-color: rgb(255, 0, 0);
-}
 
 .notShown {
     background-color: rgb(255, 249, 213);
@@ -63,11 +81,80 @@ td {
     background-color: rgb(38, 0, 255);
 } 
 
-.notMarked {
- }
+.notShown:hover {
+    background-color:  rgb(220, 198, 255);
+}
 
+
+.marked:hover {
+    background-color: rgb(74, 168, 255);
+} 
 
 .ref {
     display: none;
 }
 
+
+.shown.color0 {
+      color: rgba(0,0,0,0);
+    }
+.shown.color1 {
+      color: rgb(3, 0, 172);
+    }
+.shown.color2 {
+      color: rgb(170, 82, 0);
+    }
+.shown.color3 {
+      color: rgb(126, 155, 0);
+    }
+.shown.color4 {
+      color: rgb(0, 122, 31);
+    }
+.shown.color5 {
+      color: rgb(111, 0, 126);
+    }
+.shown.color5 {
+      color: rgb(0, 115, 119);
+    }
+.shown.color6 {
+      color: rgb(126, 0, 42)
+    }
+.shown.color7 {
+      color: rgb(43, 0, 15);
+    }
+.shown.color8 {
+        color: rgb(128, 0, 0);
+    }
+
+
+.shown.mine  {
+    background-color: rgb(255, 0, 0);    
+    /* background-image: url(.../img/mine.png); */
+    color: rgba(0,0,0,0);
+    display: flex;
+    align-items: center;
+    
+}
+
+
+.shown.marked.mine  {
+    background-color: rgb(38, 0, 255);    
+    /* background-image: url(.../img/mine.png); */
+    color: rgba(0,0,0,0);
+    display: flex;
+    align-items: center;
+    
+}
+
+.cell img {
+    width: 100%;
+    position: absolute;
+    background-position: center;
+    /* display: none; */
+    
+}
+
+
+.notShown.mine img {
+    display: none;
+}
