@@ -9,9 +9,9 @@ var gTimer;
 // interval for second pass in game
 
 var gLevel = [
-    { SIZE: 4, MINES: 2, LIFE: 1 },
-    { SIZE: 8, MINES: 12, LIFE: 2 },
-    { SIZE: 12, MINES: 30, LIFE: 3 }
+    { SIZE: 4,  MINES: 2,  LIFE: 1, SAFE_CLICK: 3},
+    { SIZE: 8,  MINES: 12, LIFE: 2, SAFE_CLICK: 3},
+    { SIZE: 12, MINES: 30, LIFE: 3, SAFE_CLICK: 3}
 ];
 // This is an object by which the
 // board size is set (in this case:
@@ -45,7 +45,8 @@ var gGame = {
 
 
 var gRenderView = {
-    strSimbolLife: simbolLifeFromHTML()
+    strSimbolLife: simbolLifeFromHTML(),
+    strSimbolDeah: '💥'
 }
 
 
@@ -86,16 +87,15 @@ function initGame() {
         beforFirstClick: true,
         lifeCount: gLevel[gCurrLevel].LIFE
     }
-    face(NORMAL);
 
     // create start game:
     gGame.isOn = true;
     gGame.beforFirstClick = true;
-
+    reActiveSafeCell();
+    face(NORMAL);
+    
     gBoard = buildBoard(gLevel[gCurrLevel].SIZE)
     renderBoard(gBoard);
-    // setMinesNegsCount(gBoard);
-    // renderBoard(gBoard);
 
     //render view
     elLifeCount()
@@ -367,22 +367,30 @@ function shownAllmines(board) {
     }
 }
 
-
+var expends = [];
 function expandShown(board, objCell) {
     console.log(objCell);
 
     if (objCell.minesAroundCount === 0 && !objCell.isMine) {
+
         for (var i = objCell.location.i - 1; i <= objCell.location.i + 1; i++) {
             if (i < 0 || i > board.length - 1) continue;
 
             for (var j = objCell.location.j - 1; j <= objCell.location.j + 1; j++) {
+                // if (board[i][j].isShown) continue; // for full expend
+
                 if (j < 0 || j > board[0].length - 1) continue;
                 if (i === objCell.location.i && j === objCell.location.j) continue;
 
                 var elNg = document.querySelector(`[data-loc='${i}-${j}']`);
                 setShownTrue(board[i][j], elNg);
+
+                // expends.push(board[i][j]);   // for full expend
+                // console.log('push to exp',expends);   // for full expend
+
+
+                //// full expend:
                 // cellClicked(elNg);
-                // console.log('cell ', board[i][j], 'elNg', elNg);
             }
         }
     }
@@ -418,10 +426,25 @@ function elLifeCount() {
     elLife.innerText = '';
     console.log('elLife.innerText', elLife.innerText);
 
-    for (let i = 0; i < gGame.lifeCount; i++) {
-        elLife.innerText += gRenderView.strSimbolLife;
-        // console.log('elLife.innerText', elLife.innerText);
-    }
+    setTimeout(function () {
+        elLife.style.marginLeft = '50px';
+        for (let i = 1; i <= gLevel[gCurrLevel].LIFE; i++) {
+            if (i <= gGame.lifeCount) {
+                elLife.innerText += gRenderView.strSimbolLife;
+            } else {
+                elLife.innerText += gRenderView.strSimbolDeah;
+            }
+            // console.log('elLife.innerText', elLife.innerText);
+        }
+    }, 200)
+
+
+
+
+
+    setTimeout(function () {
+        elLife.style.marginLeft = 'auto';
+    }, 150)
 }
 
 
@@ -443,19 +466,19 @@ function timerView() {
 
     gTimer = setInterval(function () {
         endTime = Date.now(); // Get current Time
-        console.log('end time',endTime);
+        // console.log('end time',endTime);
         if (Math.floor((endTime - startTimeSec) * 0.001) > 60) {
             startTimeSec = Date.now();
-        } 
+        }
 
         timeDiffSec = Math.floor((endTime - startTimeSec) * 0.001); // current time - startTime = Time Elapsed
         timeDiffMin = Math.floor((endTime - startTimeMin) / 60 * 0.001); // current time - startTime = Time Elapsed
         elTimer.innerText = '' + timeDiffMin + ':' + timeDiffSec;
-        console.log(timeDiffMin + ':' + timeDiffSec);
+        // console.log(timeDiffMin + ':' + timeDiffSec);
 
     }, 1000);
 
-    console.log(gGame.secsPassed);
+    // console.log(gGame.secsPassed);
 
 }
 
@@ -475,11 +498,13 @@ function face(status = 'normal') {
         case 'normal':
             clearTimeout(timeFace);
             elFace.innerText = '😺';
+            elFace.style.textShadow = 'none';
             break;
 
         case 'boom':
             clearTimeout(timeFace);
             elFace.innerText = '😾';
+            elFace.style.textShadow = '0px 0px 15px red';
             timeFace = setTimeout(function () {
                 face(NORMAL);
             }, 2000);
@@ -496,11 +521,13 @@ function face(status = 'normal') {
         case 'game over':
             clearTimeout(timeFace);
             elFace.innerText = '🙀';
+            elFace.style.textShadow = '0px 0px 15px red';
             break;
 
         case 'winner':
             clearTimeout(timeFace);
             elFace.innerText = '🐱‍👤';
+            elFace.style.textShadow = '0px 0px 15px rgb(255, 242, 206)';
             break;
 
         default:
@@ -509,3 +536,44 @@ function face(status = 'normal') {
     }
 
 }
+
+
+
+var safeClickCount = gLevel[gCurrLevel].SAFE_CLICK;
+function reActiveSafeCell() {
+    safeClickCount = gLevel[gCurrLevel].SAFE_CLICK;
+    var elSafe = document.querySelector('.safeClick');
+    elSafe.style.backgroundColor = '';
+
+    elSafe.querySelector('p').innerText = safeClickCount;
+}
+
+
+
+function safeClick(elSafe, board) {
+    if (safeClickCount <= 0) return;
+    if (safeClickCount === 1) elSafe.style.background = 'rgb(85, 89, 107)';
+
+    
+    var flatBoardCells = [];
+    for (var i = 0; i < board.length; i++) {
+        for (var j = 0; j < board[0].length; j++) {
+            var cell = board[i][j];
+            if (cell.isMine || cell.isShown) continue;
+
+            var elCell = document.querySelector(`[data-loc='${i}-${j}']`)
+            flatBoardCells.push(elCell);
+        }
+    }
+
+    var elFlicker = flatBoardCells[getRandomInt(0, board.length*board[0].length)];
+    elFlicker.classList.toggle('flicker');
+    setTimeout(function () {
+        elFlicker.classList.toggle('flicker');
+    }, 1000);
+
+   safeClickCount--;
+   elSafe.querySelector('p').innerText = safeClickCount;
+}
+
+
