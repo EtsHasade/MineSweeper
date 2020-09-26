@@ -31,6 +31,19 @@ body {
 }
 
 
+.hint {
+    width: 40px;
+    background-color: rgba(0,0,0,0);
+}
+
+
+.hintActive {
+    text-shadow: 0px 0px 9px rgb(255, 0, 13);
+}
+
+
+
+
 .dataView {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -51,6 +64,7 @@ body {
     font-size: 30px;
     border-bottom: 1px solid black;
     cursor: pointer;
+    /* cursor: default; */
     
 }
 

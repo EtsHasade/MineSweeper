@@ -9,9 +9,9 @@ var gTimer;
 // interval for second pass in game
 
 var gLevel = [
-    { SIZE: 4,  MINES: 2,  LIFE: 1, SAFE_CLICK: 3},
-    { SIZE: 8,  MINES: 12, LIFE: 2, SAFE_CLICK: 3},
-    { SIZE: 12, MINES: 30, LIFE: 3, SAFE_CLICK: 3}
+    { SIZE: 4,  MINES: 2,  LIFE: 1, SAFE_CLICK: 3, HINTS: 3},
+    { SIZE: 8,  MINES: 12, LIFE: 2, SAFE_CLICK: 3, HINTS: 3},
+    { SIZE: 12, MINES: 30, LIFE: 3, SAFE_CLICK: 3, HINTS: 3}
 ];
 // This is an object by which the
 // board size is set (in this case:
@@ -29,7 +29,8 @@ var gGame = {
     markedCount: 0,
     secsPassed: 0,
     beforFirstClick: true,
-    lifeCount: gLevel[gCurrLevel].LIFE
+    lifeCount: gLevel[gCurrLevel].LIFE,
+    isHintActive: null
 }
 // This is an object in which you
 // can keep and update the
@@ -91,6 +92,7 @@ function initGame() {
     // create start game:
     gGame.isOn = true;
     gGame.beforFirstClick = true;
+    resetFeatures();
     reActiveSafeCell();
     face(NORMAL);
     
@@ -102,8 +104,24 @@ function initGame() {
     elMarkedCount()
     console.table('end init gBoard', gBoard)
 
+
 }
 //  This is called when page loads
+
+
+
+function resetFeatures() {
+    var elFeatures = document.querySelector('.features');
+    elFeatures.innerHTML = '<button class="safeClick" onclick="safeClick(this, gBoard)"><p>1</p>Safe click</button>';
+
+    for (var i = 0; i < gLevel[gCurrLevel].HINTS; i++) {
+        elFeatures.innerHTML +=  '<button class="hint" onclick="hint(this)">💡</button>';
+    }
+
+    console.log(elFeatures);
+}
+
+
 
 
 function buildBoard(size) {
@@ -272,10 +290,16 @@ function cellClicked(elCell) {
 
     if (objCell.isMarked) return;
 
+    if(gGame.isHintActive) {
+        showHint(gBoard, elCell);
+        console.log('hint activet!');
+        return;
+    }
+
     face(CLICK);
     setShownTrue(objCell, elCell);
     expandShown(gBoard, objCell);
-    checkGameOver(objCell);
+    checkIfGotMine(objCell);
 }
 //  Called when a cell (td) is  clicked
 
@@ -317,7 +341,7 @@ function cellMarked(elCell, event) {
     objCell.isMarked = (objCell.isMarked) ? false : true;
     if (objCell.isMarked) gGame.markedCount++;
     else gGame.markedCount--;
-    if (objCell.isMarked) checkGameOver(objCell);
+    if (objCell.isMarked) checkIfGotMine(objCell);
 
     elCell.classList.toggle('marked');
 
@@ -329,7 +353,7 @@ function cellMarked(elCell, event) {
 
 
 
-function checkGameOver(objCell) {
+function checkIfGotMine(objCell) {
     console.log('chek go');
     if (objCell.isMine && objCell.isShown) {
         gGame.lifeCount--;
@@ -384,7 +408,7 @@ function expandShown(board, objCell) {
 
                 var elNg = document.querySelector(`[data-loc='${i}-${j}']`);
                 setShownTrue(board[i][j], elNg);
-
+                
                 // expends.push(board[i][j]);   // for full expend
                 // console.log('push to exp',expends);   // for full expend
 
@@ -551,6 +575,7 @@ function reActiveSafeCell() {
 
 
 function safeClick(elSafe, board) {
+    if (!gGame.isOn) return;
     if (safeClickCount <= 0) return;
     if (safeClickCount === 1) elSafe.style.background = 'rgb(85, 89, 107)';
 
@@ -577,3 +602,58 @@ function safeClick(elSafe, board) {
 }
 
 
+function hint(elBtnHint) {
+    console.log(elBtnHint.classList);
+    if (gGame.isHintActive) {
+            gGame.isHintActive = null;
+            elBtnHint.classList.remove('hintActive')
+            // document.querySelector('.game').style.cursor = 'regular';
+            console.log(gGame.isHintActive);
+            
+            
+        } else {
+            gGame.isHintActive = elBtnHint;
+            elBtnHint.classList.add('hintActive')
+            // document.querySelector('.game').style.cursor = 'zoom-in';
+            console.log(gGame.isHintActive);
+        }
+    // elBtnHint.style.display = 'none';    
+}
+
+var gHintShowens = [];
+function showHint(board, elCell) {
+    gGame.isHintActive.style.display = 'none';
+    document.querySelector('.game').style.cursor = 'default';
+    gGame.isHintActive = null;
+    console.log('hint?',gGame.isHintActive);
+    
+    var objCell = getObjCellFromElCell(elCell);
+
+    for (var i = objCell.location.i - 1; i <= objCell.location.i + 1; i++) {
+        if (i < 0 || i > board.length - 1) continue;
+
+        for (var j = objCell.location.j - 1; j <= objCell.location.j + 1; j++) {
+            if (j < 0 || j > board[0].length - 1) continue;
+            if (board[i][j].isShown) return;
+
+            var elNg = document.querySelector(`[data-loc='${i}-${j}']`);
+            setShownTrue(board[i][j], elNg);
+            gHintShowens.push({objCell:board[i][j], elCell: elNg})
+            setTimeout(function() {
+                for (var i = 0; i < gHintShowens.length; i++) {
+                    var cells = gHintShowens.pop();
+                    var objCell = cells.objCell;
+                    var elCell = cells.elCell;
+                  
+                    objCell.isShown = false;
+                    elCell.classList.add("notShown");
+                    elCell.classList.remove("shown");
+                    gGame.shownCount--;
+                    console.log('gGame.shownCount', gGame.shownCount);
+                }
+            },1000);
+
+        }
+    }
+
+}
