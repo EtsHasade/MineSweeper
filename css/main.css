@@ -4,6 +4,7 @@ body {
     background-color: rgb(182, 177, 157);
     margin: 0px;
     font-family: Arial, Helvetica, sans-serif;
+    /* background-image: url(.../img/mine.png); */
      
 }
 
@@ -23,6 +24,10 @@ body {
     padding: 5px;
 }
 
+.floor {
+    text-align: justify;
+}
+
 
 .face{
     font-size: 30px;
@@ -34,11 +39,21 @@ body {
 .hint {
     width: 40px;
     background-color: rgba(0,0,0,0);
+    cursor: pointer;
+    font-size: 20px;
 }
 
 
+.hintBox {
+    width: 40px;
+    margin-left: 40px;
+    display: inline-block;
+}
+
 .hintActive {
-    text-shadow: 0px 0px 9px rgb(255, 0, 13);
+    text-shadow: 0px 0px 9px rgb(255, 255, 255);
+    border: white 1px solid;
+    border-radius: 10%;
 }
 
 
@@ -76,6 +91,8 @@ button {
     background: rgb(255, 237, 220);
     border: none;
     transition: 0.7s;
+    -moz-user-select: none;
+    -webkit-user-select: none;
 }
 
 button p {
